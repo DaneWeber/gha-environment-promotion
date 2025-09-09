@@ -34,16 +34,21 @@ jobs:
           name: site-artifact
           path: ./build_output.txt
   deploy:
-    needs: [build]
+    needs: ${{ matrix.prev || 'build' }}
     runs-on: ubuntu-latest
     strategy:
       matrix:
         include:
           - environment: dev
+            prev: 'build'
           - environment: test
+            prev: 'dev'
           - environment: qa
+            prev: 'test'
           - environment: staging
+            prev: 'qa'
           - environment: preprod
+            prev: 'staging'
     environment: ${{ matrix.environment }}
     steps:
       - name: Checkout code
