@@ -26,7 +26,7 @@ jobs:
       - name: Simulate build
         run: echo "Building site..." && sleep 5 && echo "Build complete."
       - name: upload artifact
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: site-artifact
   deploy:
@@ -42,7 +42,7 @@ jobs:
         with:
           fetch-depth: 0
       - name: Download artifact
-        uses: actions/download-artifact@v3
+        uses: actions/download-artifact@v4
         with:
           name: site-artifact
       - name: Deploy to ${{ matrix.environment }}
@@ -59,7 +59,7 @@ jobs:
         with:
           fetch-depth: 0
       - name: Download artifact
-        uses: actions/download-artifact@v3
+        uses: actions/download-artifact@v4
         with:
           name: site-artifact
       - name: Deploy to production
