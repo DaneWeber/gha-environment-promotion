@@ -34,7 +34,6 @@ jobs:
           name: site-artifact
           path: ./build_output.txt
   deploy:
-    needs: ${{ matrix.prev || 'build' }}
     runs-on: ubuntu-latest
     strategy:
       matrix:
@@ -50,6 +49,7 @@ jobs:
           - environment: preprod
             prev: 'staging'
     environment: ${{ matrix.environment }}
+    needs: ${{ matrix.prev || 'build' }}
     steps:
       - name: Checkout code
         uses: actions/checkout@v3
