@@ -34,108 +34,36 @@ jobs:
           name: site-artifact
           path: ./build_output.txt
   deploy_dev:
-    runs-on: ubuntu-latest
     needs: build
-    environment: dev
-    steps:
-      - name: Checkout code
-        uses: actions/checkout@v3
-        with:
-          fetch-depth: 0
-      - name: Download artifact
-        uses: actions/download-artifact@v4
-        with:
-          name: site-artifact
-      - name: Deploy to dev
-        run: |
-          echo "Deploying to dev..."
-          ./deploy.sh dev
+    uses: ./.github/workflows/reusable-deploy.yml
+    with:
+      environment: dev
   deploy_test:
-    runs-on: ubuntu-latest
     needs: deploy_dev
-    environment: test
-    steps:
-      - name: Checkout code
-        uses: actions/checkout@v3
-        with:
-          fetch-depth: 0
-      - name: Download artifact
-        uses: actions/download-artifact@v4
-        with:
-          name: site-artifact
-      - name: Deploy to test
-        run: |
-          echo "Deploying to test..."
-          ./deploy.sh test
+    uses: ./.github/workflows/reusable-deploy.yml
+    with:
+      environment: test
 
   deploy_qa:
-    runs-on: ubuntu-latest
     needs: deploy_test
-    environment: qa
-    steps:
-      - name: Checkout code
-        uses: actions/checkout@v3
-        with:
-          fetch-depth: 0
-      - name: Download artifact
-        uses: actions/download-artifact@v4
-        with:
-          name: site-artifact
-      - name: Deploy to qa
-        run: |
-          echo "Deploying to qa..."
-          ./deploy.sh qa
+    uses: ./.github/workflows/reusable-deploy.yml
+    with:
+      environment: qa
 
   deploy_staging:
-    runs-on: ubuntu-latest
     needs: deploy_qa
-    environment: staging
-    steps:
-      - name: Checkout code
-        uses: actions/checkout@v3
-        with:
-          fetch-depth: 0
-      - name: Download artifact
-        uses: actions/download-artifact@v4
-        with:
-          name: site-artifact
-      - name: Deploy to staging
-        run: |
-          echo "Deploying to staging..."
-          ./deploy.sh staging
+    uses: ./.github/workflows/reusable-deploy.yml
+    with:
+      environment: staging
 
   deploy_preprod:
-    runs-on: ubuntu-latest
     needs: deploy_staging
-    environment: preprod
-    steps:
-      - name: Checkout code
-        uses: actions/checkout@v3
-        with:
-          fetch-depth: 0
-      - name: Download artifact
-        uses: actions/download-artifact@v4
-        with:
-          name: site-artifact
-      - name: Deploy to preprod
-        run: |
-          echo "Deploying to preprod..."
-          ./deploy.sh preprod
+    uses: ./.github/workflows/reusable-deploy.yml
+    with:
+      environment: preprod
 
   deploy_production:
-    runs-on: ubuntu-latest
     needs: deploy_preprod
-    environment: prod
-    steps:
-      - name: Checkout code
-        uses: actions/checkout@v3
-        with:
-          fetch-depth: 0
-      - name: Download artifact
-        uses: actions/download-artifact@v4
-        with:
-          name: site-artifact
-      - name: Deploy to production
-        run: |
-          echo "Deploying to production..."
-          ./deploy.sh production
+    uses: ./.github/workflows/reusable-deploy.yml
+    with:
+      environment: prod
