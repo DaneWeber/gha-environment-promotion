@@ -6,7 +6,7 @@
 # - qa
 # - staging
 # - preprod
-# - production
+# - prod
 
 name: Matrix Deploy
 
@@ -33,23 +33,10 @@ jobs:
         with:
           name: site-artifact
           path: ./build_output.txt
-  deploy:
+  deploy_dev:
     runs-on: ubuntu-latest
-    strategy:
-      matrix:
-        include:
-          - environment: dev
-            prev: 'build'
-          - environment: test
-            prev: 'dev'
-          - environment: qa
-            prev: 'test'
-          - environment: staging
-            prev: 'qa'
-          - environment: preprod
-            prev: 'staging'
-    environment: ${{ matrix.environment }}
-    needs: ${{ matrix.prev || 'build' }}
+    needs: build
+    environment: dev
     steps:
       - name: Checkout code
         uses: actions/checkout@v3
@@ -59,14 +46,86 @@ jobs:
         uses: actions/download-artifact@v4
         with:
           name: site-artifact
-      - name: Deploy to ${{ matrix.environment }}
+      - name: Deploy to dev
         run: |
-          echo "Deploying to ${{ matrix.environment }} environment"
-          ./deploy.sh ${{ matrix.environment }}
-  prod-deploy:
-    needs: deploy
+          echo "Deploying to dev..."
+          ./deploy.sh dev
+  deploy_test:
     runs-on: ubuntu-latest
-    environment: production
+    needs: deploy_dev
+    environment: test
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+        with:
+          fetch-depth: 0
+      - name: Download artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: site-artifact
+      - name: Deploy to test
+        run: |
+          echo "Deploying to test..."
+          ./deploy.sh test
+
+  deploy_qa:
+    runs-on: ubuntu-latest
+    needs: deploy_test
+    environment: qa
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+        with:
+          fetch-depth: 0
+      - name: Download artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: site-artifact
+      - name: Deploy to qa
+        run: |
+          echo "Deploying to qa..."
+          ./deploy.sh qa
+
+  deploy_staging:
+    runs-on: ubuntu-latest
+    needs: deploy_qa
+    environment: staging
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+        with:
+          fetch-depth: 0
+      - name: Download artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: site-artifact
+      - name: Deploy to staging
+        run: |
+          echo "Deploying to staging..."
+          ./deploy.sh staging
+
+  deploy_preprod:
+    runs-on: ubuntu-latest
+    needs: deploy_staging
+    environment: preprod
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+        with:
+          fetch-depth: 0
+      - name: Download artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: site-artifact
+      - name: Deploy to preprod
+        run: |
+          echo "Deploying to preprod..."
+          ./deploy.sh preprod
+
+  deploy_production:
+    runs-on: ubuntu-latest
+    needs: deploy_preprod
+    environment: prod
     steps:
       - name: Checkout code
         uses: actions/checkout@v3
@@ -78,5 +137,5 @@ jobs:
           name: site-artifact
       - name: Deploy to production
         run: |
-          echo "Deploying to production environment"
+          echo "Deploying to production..."
           ./deploy.sh production
